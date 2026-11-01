@@ -11,6 +11,8 @@ import 'duo_device.dart';
 /// For two things to be compared side by side — two products, two plans —
 /// one a half, when [TwoPane] is too coarse: the rows of a table, each lined
 /// up under the same split.
+///
+/// {@category Panes}
 @immutable
 class FoldSplit {
   const FoldSplit({required this.start, required this.gap});
@@ -55,6 +57,8 @@ class FoldSplit {
 /// [start] and [end] either side of the fold, as [split] divides the row:
 /// lay every row of a comparison out with the same split, and its values
 /// line up under their headings.
+///
+/// {@category Panes}
 class FoldRow extends StatelessWidget {
   const FoldRow({
     super.key,

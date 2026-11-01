@@ -19,6 +19,8 @@ import 'duo_device.dart';
 /// It needs iOS 27.1, and the app's root view controller to be the plugin's
 /// `DuoFlutterViewController` (see the README). Without it, the screen keeps
 /// the column and a debug build says why, once.
+///
+/// {@category Edges}
 class NoVerticalBar extends StatefulWidget {
   const NoVerticalBar({super.key, required this.child});
 

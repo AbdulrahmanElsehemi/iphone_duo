@@ -10,7 +10,13 @@
 ///     DuoSimulator.onItsSide.scope(child: const ComparePage()),
 ///   );
 /// });
+///
+/// // Or once in every way the Duo is held, a phone and an iPad:
+/// testDuoWidgets('the compare table fits', (tester, duo) async {
+///   await tester.pumpWidget(duo.scope(child: const ComparePage()));
+/// });
 /// ```
 library;
 
+export 'src/duo_test.dart';
 export 'src/simulator.dart';

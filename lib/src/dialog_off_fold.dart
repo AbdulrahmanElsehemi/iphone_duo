@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'duo_device.dart';
+import 'debug_check.dart';
 
 /// A dialog kept off the iPhone Duo's fold, as Apple asks: under a fold that
 /// runs across the screen (the Duo open upright, or stood half open as a
@@ -18,6 +19,8 @@ import 'duo_device.dart';
 ///   builder: (context) => DialogOffFold(child: AlertDialog(...)),
 /// );
 /// ```
+///
+/// {@category Off the fold}
 class DialogOffFold extends StatelessWidget {
   const DialogOffFold({super.key, required this.child});
 
@@ -25,10 +28,13 @@ class DialogOffFold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugCheckDuoScope(context, 'DialogOffFold');
     final fold = DuoDevice.regionsOf(context).fold;
+    if (fold == null) return child;
+    // Only past here, so a screen without a fold doesn't rebuild the dialog
+    // on every change to the window (the keyboard rising).
     final data = MediaQuery.of(context);
     final window = data.size;
-    if (fold == null) return child;
 
     // The fold and its margins, and all of the screen on the far side of
     // them. Per side of the glass: the fold is where it is.

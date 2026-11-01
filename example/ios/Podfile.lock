@@ -1,21 +1,21 @@
 PODS:
-  - iphone_duo (0.2.0):
-    - Flutter
   - Flutter (1.0.0)
+  - iphone_duo (0.6.0):
+    - Flutter
 
 DEPENDENCIES:
-  - iphone_duo (from `.symlinks/plugins/iphone_duo/ios`)
   - Flutter (from `Flutter`)
+  - iphone_duo (from `.symlinks/plugins/iphone_duo/ios`)
 
 EXTERNAL SOURCES:
-  iphone_duo:
-    :path: ".symlinks/plugins/iphone_duo/ios"
   Flutter:
     :path: Flutter
+  iphone_duo:
+    :path: ".symlinks/plugins/iphone_duo/ios"
 
 SPEC CHECKSUMS:
-  iphone_duo: cfe55d96d18cdb6aa71a2d4de76ca0eec3fee327
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  iphone_duo: fc88acb0b2a102039e76df79b7449748d660bb76
 
 PODFILE CHECKSUM: 3ba3a73b1b12adcf321a227a745625fe0888cc82
 

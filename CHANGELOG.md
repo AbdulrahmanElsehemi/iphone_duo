@@ -1,3 +1,45 @@
+## 0.6.0
+
+Everything new is opt-in: an app on 0.5.1 builds and behaves as before.
+
+* `DuoNavigationShell` and `DuoDestination`: an app's tabs in one widget,
+  down the status bar's column on the Duo and a `NavigationBar` elsewhere,
+  or the app's own bar (`bottomBar`). The pages keep their state as the Duo
+  opens and folds.
+* `ListDetailController`: opens and closes an item of a `ListDetail` from
+  outside the list (a deep link, a notification). `ListDetail(initialItem:)`
+  starts on one. On a narrow window either goes to its own page through
+  `onNarrowed`.
+* `ListDetail(detailNavigator: true)`: the detail pane has a navigator of
+  its own, so a page the item opens stays beside the list.
+  `onGenerateDetailRoute` gives it the app's named routes.
+* `HingeBuilder`: how far the Duo is open, from 0 to 1, for something that
+  moves with the hinge.
+* `dart run iphone_duo:doctor`: checks an app for what the Duo needs (the
+  landscape orientations, `DuoScope`, `KeyboardAboveFold`, the view
+  controller `NoVerticalBar` needs, Xcode), and exits with 1 when something
+  keeps the package from working.
+* In a debug build, a widget with no `DuoScope` above it says so once.
+* `testDuoWidgets` in `package:iphone_duo/testing.dart` runs a test once in
+  every way the Duo is held, a phone and an iPad, and
+  `DuoSimulator.applyTo(tester)` sizes a test's view as one of them. The
+  package now depends on `flutter_test` from the Flutter SDK for them.
+* `EdgeBleedArea`: around a page's scroll view padded by
+  `EdgeBleed.padding`, it takes the side insets out of the `MediaQuery`
+  under it, so a `ListTile` or a `SafeArea` in the list no longer keeps
+  clear of the status bar's column a second time. `EdgeBleed` and
+  `HeroBleed` under it still reach the glass.
+* Fixed: VoiceOver can press the tabs of `SideTabBar` and the buttons down
+  the column. They were read out but had no action.
+* Fixed: `SideTabBar`'s pages no longer start over when the bar comes or
+  goes, as when the Duo opens upright from closed.
+* `KeyboardAboveFold` and `DialogOffFold` no longer rebuild on every change
+  to the window where there is no keyboard or no fold.
+* The API docs are grouped by category, and the README has recipes for
+  go_router, deep links and state management.
+* The example's tabs are a `DuoNavigationShell`, its shop a `ListDetail`,
+  and its Profile tab opens a product as a deep link does.
+
 ## 0.5.1
 
 * The repository is now github.com/AbdulrahmanElsehemi/iphone_duo, and

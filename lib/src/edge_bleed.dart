@@ -15,7 +15,10 @@ import 'package:flutter/widgets.dart';
 /// It needs a page that keeps its side insets inside its scroll view rather
 /// than around it — `SafeArea(left: false, right: false)` with the scroll
 /// view padded by [sides] — or the scroll view clips the row at the inset
-/// anyway.
+/// anyway. Put that scroll view in an [EdgeBleedArea], so a `ListTile` or a
+/// `SafeArea` in it doesn't keep clear of the column a second time.
+///
+/// {@category Edges}
 class EdgeBleed extends StatelessWidget {
   const EdgeBleed({super.key, required this.child});
 
@@ -24,6 +27,9 @@ class EdgeBleed extends StatelessWidget {
   /// The side insets of the glass at [context] — what a page pads its scroll
   /// view by, and what a row under it reaches through.
   static EdgeInsets sides(BuildContext context) {
+    // Under an EdgeBleedArea, the insets it took out of the MediaQuery.
+    final area = context.dependOnInheritedWidgetOfExactType<_AreaSides>();
+    if (area != null) return area.sides;
     // Per side of the glass, not by the reading direction: the status bar
     // is where it is.
     return MediaQuery.paddingOf(context).copyWith(top: 0, bottom: 0);
@@ -46,6 +52,61 @@ class EdgeBleed extends StatelessWidget {
   }
 }
 
+/// A page's scroll view padded by the side insets ([EdgeBleed.padding]),
+/// with those insets taken out of the `MediaQuery` under it: a `ListTile`, a
+/// `SafeArea` or anything else in the list that keeps clear of the status
+/// bar's column would otherwise do it a second time, and stop short of the
+/// page's other content by the column's width.
+///
+/// [EdgeBleed] and [HeroBleed] under it still reach the edge of the glass:
+/// they read the insets from here ([EdgeBleed.sides]).
+///
+/// ```dart
+/// EdgeBleedArea(
+///   child: ListView(
+///     padding: EdgeBleed.padding(context, const EdgeInsets.all(16)),
+///     children: [
+///       ListTile(title: Text('Orders')), // as wide as the page's text
+///       EdgeBleed(child: cardsRow),     // still to the glass
+///     ],
+///   ),
+/// )
+/// ```
+///
+/// Wrap the scroll view itself, inside the page: the insets are the ones at
+/// [EdgeBleedArea], and a pane of a `TwoPane` has its own.
+///
+/// {@category Edges}
+class EdgeBleedArea extends StatelessWidget {
+  const EdgeBleedArea({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final sides = EdgeBleed.sides(context);
+    if (sides.horizontal == 0) return child;
+    return _AreaSides(
+      sides: sides,
+      child: MediaQuery.removePadding(
+        context: context,
+        removeLeft: true,
+        removeRight: true,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _AreaSides extends InheritedWidget {
+  const _AreaSides({required this.sides, required super.child});
+
+  final EdgeInsets sides;
+
+  @override
+  bool updateShouldNotify(_AreaSides oldWidget) => sides != oldWidget.sides;
+}
+
 /// A page's lead picture (a product's photo, a banner, a map) that reaches
 /// under the status bar's column to the edge of the glass, where the column
 /// runs down a side of the screen — the iPhone Duo closed, or open on its
@@ -64,6 +125,8 @@ class EdgeBleed extends StatelessWidget {
 /// It needs the page [EdgeBleed] does: side insets kept inside the scroll
 /// view, `SafeArea(left: false, right: false)` with the content padded by
 /// [EdgeBleed.sides].
+///
+/// {@category Edges}
 class HeroBleed extends StatelessWidget {
   const HeroBleed({super.key, required this.child, this.overlay});
 

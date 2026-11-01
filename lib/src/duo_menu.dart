@@ -6,6 +6,8 @@ import 'duo_device.dart';
 import 'side_toolbar.dart';
 
 /// One choice in a "…" menu ([SideToolbarMenuButton], [DuoAppBar.menu]).
+///
+/// {@category Navigation}
 @immutable
 class DuoMenuItem {
   const DuoMenuItem({
@@ -41,6 +43,8 @@ class DuoMenuItem {
 /// button laid over the disc, so it looks, opens and reads out as the menus
 /// of Apple's apps do. Elsewhere, and in tests, it is Flutter's [MenuAnchor]
 /// with the same items.
+///
+/// {@category Navigation}
 class SideToolbarMenuButton extends StatefulWidget {
   const SideToolbarMenuButton({
     super.key,
@@ -182,6 +186,8 @@ class _SideToolbarMenuButtonState extends State<SideToolbarMenuButton> {
 
 /// Flutter's menu of [items], opened by what [builder] builds: the "…" off
 /// iOS, and in a [DuoAppBar] across the top.
+///
+/// {@category Navigation}
 class DuoMenuAnchor extends StatelessWidget {
   const DuoMenuAnchor({super.key, required this.items, required this.builder});
 

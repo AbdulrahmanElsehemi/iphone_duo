@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'duo_menu.dart';
 import 'side_toolbar.dart';
+import 'debug_check.dart';
 
 /// An icon button of a [DuoAppBar]: an [IconButton] in the bar, a
 /// [SideToolbarButton] in the column.
+///
+/// {@category Navigation}
 class DuoAction {
   const DuoAction({
     required this.icon,
@@ -46,6 +49,8 @@ class DuoAction {
 ///   ),
 /// )
 /// ```
+///
+/// {@category Navigation}
 class DuoAppBar extends StatelessWidget implements PreferredSizeWidget {
   const DuoAppBar({
     super.key,
@@ -85,6 +90,7 @@ class DuoAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugCheckDuoScope(context, 'DuoAppBar');
     if (!SideToolbar.show(context)) {
       return AppBar(
         title: title,

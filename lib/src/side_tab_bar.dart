@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'bar_edge.dart';
+import 'debug_check.dart';
 
 /// One tab of a [SideTabBar].
+///
+/// {@category Navigation}
 class SideTab {
   const SideTab({required this.icon, this.selectedIcon, required this.label});
 
@@ -19,6 +22,8 @@ class SideTab {
 
 /// How a [SideTabBar] looks. Colours left null come from the theme's
 /// [ColorScheme].
+///
+/// {@category Navigation}
 class SideTabBarStyle {
   const SideTabBarStyle({
     this.backgroundColor,
@@ -93,6 +98,8 @@ class SideTabBarStyle {
 ///   bottomNavigationBar: SideTabBar.show(context) ? null : NavigationBar(...),
 /// )
 /// ```
+///
+/// {@category Navigation}
 class SideTabBar extends StatefulWidget {
   const SideTabBar({
     super.key,
@@ -124,6 +131,10 @@ class SideTabBar extends StatefulWidget {
 class _SideTabBarState extends State<SideTabBar> {
   var _minimized = false;
 
+  /// Keeps the pages where they are as the bar comes and goes: the Duo
+  /// opened upright from closed, or turned on its side.
+  final _pages = GlobalKey();
+
   void _show(bool minimized) {
     if (_minimized != minimized) setState(() => _minimized = minimized);
   }
@@ -152,8 +163,10 @@ class _SideTabBarState extends State<SideTabBar> {
 
   @override
   Widget build(BuildContext context) {
+    debugCheckDuoScope(context, 'SideTabBar');
     final edge = context.barEdge;
-    if (edge == null) return widget.child;
+    final pages = KeyedSubtree(key: _pages, child: widget.child);
+    if (edge == null) return pages;
     final insets = context.windowInsets;
     final left = edge == BarEdge.left;
 
@@ -161,7 +174,7 @@ class _SideTabBarState extends State<SideTabBar> {
       children: [
         NotificationListener<UserScrollNotification>(
           onNotification: _onScroll,
-          child: widget.child,
+          child: pages,
         ),
         // Per side of the glass, not by the reading direction: the status
         // bar is where it is.
@@ -273,6 +286,8 @@ class _Tab extends StatelessWidget {
       button: true,
       selected: selected,
       label: tab.label,
+      // The tap the GestureDetector would have given, for VoiceOver.
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,

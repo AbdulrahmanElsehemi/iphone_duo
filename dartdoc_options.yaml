@@ -1,0 +1,9 @@
+dartdoc:
+  categoryOrder:
+    - Setup
+    - Navigation
+    - Panes
+    - Off the fold
+    - Edges
+    - Device
+    - Testing

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'bar_edge.dart';
 import 'duo_device.dart';
 import 'window_class.dart';
+import 'debug_check.dart';
 
 /// Two panes side by side, split down the middle of the window, for a wide
 /// window ([fits]): a list beside the item picked, a photo beside what it
@@ -21,6 +22,8 @@ import 'window_class.dart';
 /// bar gives its header's buttons to the column down it ([SideToolbar]); the
 /// other keeps them above it, by the content they act on, as Apple's guide
 /// for the iPhone Duo does.
+///
+/// {@category Panes}
 class TwoPane extends StatelessWidget {
   const TwoPane({super.key, required this.start, required this.end});
 
@@ -35,6 +38,7 @@ class TwoPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugCheckDuoScope(context, 'TwoPane');
     final ltr = Directionality.of(context) == TextDirection.ltr;
     final edge = context.barEdge;
     // The pane on the left of the glass is the start one in English, the

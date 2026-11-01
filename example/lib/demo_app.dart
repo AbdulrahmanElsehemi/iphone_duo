@@ -2,6 +2,7 @@ import 'package:iphone_duo/iphone_duo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'data.dart';
 import 'shell.dart';
 
 /// A small shop, laid out for a phone, an iPad and the iPhone Duo.
@@ -12,6 +13,7 @@ class DemoApp extends StatelessWidget {
     this.fontFamily,
     this.fontFamilyFallback,
     this.initialTab = 0,
+    this.linkedProduct,
   });
 
   /// English or Arabic; the device's when null.
@@ -21,6 +23,9 @@ class DemoApp extends StatelessWidget {
   final String? fontFamily;
   final List<String>? fontFamilyFallback;
   final int initialTab;
+
+  /// A product opened in the shop as the app starts, as a deep link would.
+  final Product? linkedProduct;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +47,7 @@ class DemoApp extends StatelessWidget {
       ),
       // The one line the package needs.
       builder: (context, child) => DuoScope(child: child!),
-      home: Shell(initialTab: initialTab),
+      home: Shell(initialTab: initialTab, linkedProduct: linkedProduct),
     );
   }
 }

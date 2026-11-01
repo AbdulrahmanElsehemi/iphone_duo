@@ -41,45 +41,47 @@ class HomePage extends StatelessWidget {
             gap: 12,
             even: true,
           );
-          return ListView(
-            padding: EdgeBleed.padding(
-              context,
-              const EdgeInsets.fromLTRB(16, 8, 16, 120),
-            ),
-            children: [
-              const HeroBanner(),
-              SectionTitle(tr(context, 'Picks for you', 'مختارات لك')),
-              EdgeBleed(
-                child: SizedBox(
-                  height: 176,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeBleed.padding(
-                      context,
-                      const EdgeInsets.symmetric(horizontal: 16),
+          return EdgeBleedArea(
+            child: ListView(
+              padding: EdgeBleed.padding(
+                context,
+                const EdgeInsets.fromLTRB(16, 8, 16, 120),
+              ),
+              children: [
+                const HeroBanner(),
+                SectionTitle(tr(context, 'Picks for you', 'مختارات لك')),
+                EdgeBleed(
+                  child: SizedBox(
+                    height: 176,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeBleed.padding(
+                        context,
+                        const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      itemCount: products.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder:
+                          (context, i) => SizedBox(
+                            width: 140,
+                            child: ProductCard(products[i]),
+                          ),
                     ),
-                    itemCount: products.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder:
-                        (context, i) => SizedBox(
-                          width: 140,
-                          child: ProductCard(products[i]),
-                        ),
                   ),
                 ),
-              ),
-              SectionTitle(tr(context, 'All products', 'كل المنتجات')),
-              GridView.count(
-                crossAxisCount: columns,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.8,
-                children: [for (final p in products) ProductCard(p)],
-              ),
-            ],
+                SectionTitle(tr(context, 'All products', 'كل المنتجات')),
+                GridView.count(
+                  crossAxisCount: columns,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.8,
+                  children: [for (final p in products) ProductCard(p)],
+                ),
+              ],
+            ),
           );
         },
       ),

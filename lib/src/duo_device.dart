@@ -7,9 +7,13 @@ import 'package:flutter/widgets.dart';
 import 'bar_edge.dart';
 
 /// How far the iPhone Duo's hinge is open.
+///
+/// {@category Device}
 enum HingeStatus { unknown, closed, partiallyOpen, fullyOpen }
 
 /// The iPhone Duo's hinge, as iOS reports it.
+///
+/// {@category Device}
 @immutable
 class Hinge {
   const Hinge({required this.angle, required this.status});
@@ -32,6 +36,8 @@ class Hinge {
 
 /// A part of the window iOS keeps something in: the fold, the camera, the
 /// status bar. In the window's logical pixels, the same as Flutter's.
+///
+/// {@category Device}
 @immutable
 class ReservedRegion {
   const ReservedRegion({
@@ -73,6 +79,8 @@ class ReservedRegion {
 }
 
 /// How the iPhone Duo is held, from its [Hinge] and its fold.
+///
+/// {@category Device}
 enum DuoPosture {
   /// Shut: the app is on the outer screen.
   closed,
@@ -93,6 +101,8 @@ enum DuoPosture {
 /// From iOS 27.1, through the plugin's channel. On anything else — an older
 /// iOS, an app built with an older Xcode, a widget test, or off iOS — it is
 /// [DuoDevice.unknown], and the package reads the safe area instead.
+///
+/// {@category Device}
 @immutable
 class DuoDevice {
   const DuoDevice({

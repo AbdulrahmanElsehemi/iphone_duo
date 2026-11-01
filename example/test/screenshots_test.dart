@@ -251,11 +251,18 @@ Widget canvas(List<Widget> devices, {String? title}) {
   );
 }
 
-Widget app({Locale locale = const Locale('en'), int tab = 0}) => DemoApp(
+/// The app on [tab]; with [linked], the shop opens that product as a deep
+/// link would.
+Widget app({
+  Locale locale = const Locale('en'),
+  int tab = 0,
+  Product? linked,
+}) => DemoApp(
   locale: locale,
   fontFamily: _font,
   fontFamilyFallback: _fallback,
   initialTab: tab,
+  linkedProduct: linked,
 );
 
 /// What an app built for a phone does on the iPhone Duo: a bar across the
@@ -372,7 +379,11 @@ void main() {
       canvas([
         device(phone, app(), label: 'iPhone'),
         device(outer, app(), label: 'iPhone Duo · closed'),
-        device(openSide, app(tab: 1), label: 'iPhone Duo · open on its side'),
+        device(
+          openSide,
+          app(tab: 1, linked: products.first),
+          label: 'iPhone Duo · open on its side',
+        ),
       ]),
       size: room,
     );
@@ -447,7 +458,11 @@ void main() {
       tester,
       'two_panes',
       canvas([
-        device(openSide, app(tab: 1), label: 'Shop: the list | the product'),
+        device(
+          openSide,
+          app(tab: 1, linked: products.first),
+          label: 'Shop: the list | the product',
+        ),
         device(openSide, app(), label: 'A product: the photo | the details'),
       ]),
       size: room,

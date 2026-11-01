@@ -21,6 +21,8 @@ import 'duo_device.dart';
 ///       DuoScope(child: KeyboardAboveFold(child: child!)),
 /// )
 /// ```
+///
+/// {@category Off the fold}
 class KeyboardAboveFold extends StatelessWidget {
   const KeyboardAboveFold({super.key, required this.child});
 
@@ -28,12 +30,13 @@ class KeyboardAboveFold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = MediaQuery.of(context);
-    final keyboard = data.viewInsets.bottom;
+    // The keyboard alone first: with none up, nothing else of the window
+    // need rebuild this.
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    if (keyboard == 0) return child;
     final fold = DuoDevice.regionsOf(context).fold;
-    if (keyboard == 0 || fold == null || fold.axis != Axis.horizontal) {
-      return child;
-    }
+    if (fold == null || fold.axis != Axis.horizontal) return child;
+    final data = MediaQuery.of(context);
     final fromFold = data.size.height - fold.frame.top;
     return MediaQuery(
       data: data.copyWith(

@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 /// How wide the window is, in Material's window size classes.
+///
+/// {@category Device}
 enum WindowClass {
   /// A phone held upright, the iPhone Duo closed.
   compact,
@@ -20,6 +22,8 @@ enum WindowClass {
 }
 
 /// The widths a layout changes at.
+///
+/// {@category Device}
 abstract final class DuoBreakpoints {
   /// From here a window is [WindowClass.medium].
   static const double medium = 600;

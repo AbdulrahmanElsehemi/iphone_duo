@@ -10,6 +10,8 @@ import 'duo_device.dart';
 /// The presets are the ones a layout that changes on the Duo is tested in:
 /// [closed], [upright], [onItsSide], [tabletop], [book], and for the same
 /// layout off the Duo, [phone] and [iPad].
+///
+/// {@category Testing}
 @immutable
 class DuoSimulator {
   const DuoSimulator({

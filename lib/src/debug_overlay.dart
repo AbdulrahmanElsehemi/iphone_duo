@@ -11,6 +11,8 @@ import 'duo_device.dart';
 ///
 /// Nothing is drawn while [enabled] is false, and none of it takes a tap.
 /// `DuoScope(debugShowRegions: true)` puts it over the whole app.
+///
+/// {@category Device}
 class DuoDebugOverlay extends StatelessWidget {
   const DuoDebugOverlay({super.key, this.enabled = true, required this.child});
 

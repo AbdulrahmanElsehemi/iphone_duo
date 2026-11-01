@@ -1,6 +1,6 @@
 name: iphone_duo
 description: "iPhone Duo layouts from Apple's HIG: a side tab bar that minimizes, toolbars down the status bar column, two panes at the fold, rows that scroll under the side strip."
-version: 0.5.1
+version: 0.6.0
 repository: https://github.com/AbdulrahmanElsehemi/iphone_duo
 issue_tracker: https://github.com/AbdulrahmanElsehemi/iphone_duo/issues
 topics:
@@ -23,10 +23,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-dev_dependencies:
+  # Only for `package:iphone_duo/testing.dart`, which an app imports from its
+  # tests; part of the Flutter SDK, so nothing new to download.
   flutter_test:
     sdk: flutter
+
+dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:

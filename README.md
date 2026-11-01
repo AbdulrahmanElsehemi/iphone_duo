@@ -27,18 +27,22 @@ runs there as on any phone or tablet without a fold: no side column, and
 - [Install](#install)
 - [Quick start](#quick-start)
 - [Moving an existing app over](#moving-an-existing-app-over)
+- [Checking your app](#checking-your-app): `dart run iphone_duo:doctor`
 - [Widgets](#widgets): [`DuoScope`](#duoscope) ·
+  [`DuoNavigationShell`](#duonavigationshell) ·
   [`SideTabBar`](#sidetabbar) · [`DuoAppBar`](#duoappbar) ·
   [`SideToolbar`](#sidetoolbar) · [`TwoPane`](#twopane) ·
   [`ListDetail`](#listdetail) · [`DialogOffFold`](#dialogofffold) ·
   [Bottom sheets](#bottom-sheets) · [`KeyboardAboveFold`](#keyboardabovefold) ·
-  [`FoldSplit`](#foldsplit) · [`EdgeBleed`](#edgebleed) ·
+  [`FoldSplit`](#foldsplit) · [`EdgeBleed`](#edgebleed) (and
+  `EdgeBleedArea`) ·
   [`HeroBleed`](#herobleed) · [`NoVerticalBar`](#noverticalbar) ·
   [`TabletopLayout`](#tabletoplayout)
 - [Reading the device](#reading-the-device): the hinge, the fold, the
-  posture, `PostureBuilder`
+  posture, `PostureBuilder`, `HingeBuilder`
 - [Helpers](#helpers): `context.barEdge`, window classes, even columns
 - [With `flutter_screenutil`](#with-flutter_screenutil)
+- [Recipes](#recipes): go_router, deep links, bloc
 - [Testing your layouts](#testing-your-layouts)
 - [How it works](#how-it-works)
 - [Apple's rules this follows](#apples-rules-this-follows)
@@ -93,6 +97,9 @@ And there are problems you can't see in that picture:
 
 - **One line of setup.** Wrap your app in `DuoScope`, and every widget below
   adapts by itself.
+- **A doctor for your setup.** `dart run iphone_duo:doctor` checks your app
+  for what the Duo needs: the landscape orientations, `DuoScope`, Xcode. In
+  a debug build, a widget with no `DuoScope` above it says so once.
 - **It asks iOS.** A small iOS plugin reads iOS 27.1's own APIs: which side
   the status bar's column is on, the hinge angle, and where the fold and the
   camera are. Before iOS 27.1, and off iOS, it falls back to reading the safe
@@ -106,6 +113,9 @@ And there are problems you can't see in that picture:
 - **The tab bar Apple asks for.** A capsule of icons at the foot of the
   column. It shrinks to the current tab when you scroll down, and opens again
   when you scroll up or tap it.
+- **The whole tab shell in one widget.** `DuoNavigationShell` shows the tabs
+  down the column on the Duo and a `NavigationBar` everywhere else, and the
+  pages keep their state as the Duo opens and folds.
 - **iOS's own "…" menu.** Past three buttons, the rest go behind a "…" at
   the foot of the column, in iOS's own pull-down menu.
 - **A screen can keep its bars across.** `NoVerticalBar` asks iOS to keep
@@ -120,6 +130,8 @@ And there are problems you can't see in that picture:
 - **List and detail, like Mail.** `ListDetail` opens an item beside its list
   on the open Duo and on its own page on a phone. Fold the Duo shut and the
   item you were reading goes on to its own page; the list keeps its scroll.
+  A `ListDetailController` opens an item from a deep link, and the detail
+  pane can have a navigator of its own.
 - **Dialogs and sheets off the fold.** `DialogOffFold` keeps a dialog to
   one half, the way Apple asks. `showModalBottomSheetOffFold` opens a sheet
   under the fold, or in the end half beside it.
@@ -142,16 +154,20 @@ And there are problems you can't see in that picture:
   same physical side of the glass, as Apple asks. The content mirrors, and in
   `TwoPane` the panes swap.
 - **Accessible.** Icon-only tabs and buttons still carry labels and tooltips
-  for screen readers. Tap targets are 44 points, Apple's minimum. Animations
+  for screen readers, and VoiceOver can press them. Tap targets are 44
+  points, Apple's minimum, and tests check both. Animations
   are skipped when the system asks for reduced motion.
 - **Themed by default.** Colours come from your `ColorScheme`, and every
   size, colour and timing can be overridden.
 - **Works with `flutter_screenutil`**, or without it. `DuoDesignSize` gives
   the right `designSize` for every window.
-- **No dependencies** beyond Flutter.
-- **Tested.** 88 tests, and an example app to try on the simulator.
+- **Moves with the hinge.** `HingeBuilder` hands you how far the Duo is
+  open, from 0 to 1, for something that opens with the device.
+- **No dependencies** beyond the Flutter SDK.
+- **Tested.** 160 tests, and an example app to try on the simulator.
 - **Test helpers.** `package:iphone_duo/testing.dart` has the simulator's
-  numbers for every way the Duo is held, so your tests don't copy them.
+  numbers for every way the Duo is held, and `testDuoWidgets` runs a test
+  once in each.
 - **A debug overlay.** `DuoScope(debugShowRegions: true)` draws the fold,
   the camera and the column over your app.
 
@@ -165,7 +181,7 @@ or in `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  iphone_duo: ^0.5.0
+  iphone_duo: ^0.6.0
 ```
 
 Then run `flutter pub get`, and `pod install` in `ios/` if your app uses
@@ -184,6 +200,29 @@ The hinge, the fold and the camera regions come from the iOS 27.1 SDK, so
 build with Xcode 27.1 or later to get them. An app built with an older Xcode
 still builds and runs: the plugin answers that it knows nothing, and the
 package reads the safe area instead.
+
+## Checking your app
+
+From your app's folder:
+
+```bash
+dart run iphone_duo:doctor
+```
+
+It reads your app, changes nothing, and lists what the Duo needs:
+
+```
+iphone_duo doctor
+  ✓ iphone_duo is in pubspec.yaml.
+  ✓ Info.plist lets the iPhone turn on its side: the open Duo can.
+  ✓ DuoScope is in the app.
+  ! No KeyboardAboveFold: on the Duo open upright, a field can sit on the fold while typing.
+    DuoScope(child: KeyboardAboveFold(child: child!))
+  ✓ Xcode 27.1 builds in the hinge, the fold and the column.
+```
+
+`✗` is something that keeps the package from working, and the command then
+exits with 1, so it can run in CI. `!` is advice.
 
 ## Quick start
 
@@ -219,18 +258,15 @@ This change needs a full rebuild: hot reload and hot restart won't pick it up.
 **3. Use the widgets in your screens:**
 
 ```dart
-// The tab shell.
-Scaffold(
-  body: SideTabBar(
-    tabs: const [
-      SideTab(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-      SideTab(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
-    ],
-    currentIndex: index,
-    onTap: (i) => setState(() => index = i),
-    child: IndexedStack(index: index, children: pages),
-  ),
-  bottomNavigationBar: SideTabBar.show(context) ? null : NavigationBar(/* ... */),
+// The tab shell: tabs down the column on the Duo, a NavigationBar elsewhere.
+DuoNavigationShell(
+  destinations: const [
+    DuoDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+    DuoDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
+  ],
+  selectedIndex: index,
+  onDestinationSelected: (i) => setState(() => index = i),
+  body: IndexedStack(index: index, children: pages),
 )
 
 // Any screen with a bar.
@@ -245,8 +281,8 @@ Scaffold(
 )
 ```
 
-That's it. Run the app on the iPhone Duo simulator, then fold, open and turn
-it.
+That's it. Run `dart run iphone_duo:doctor`, then run the app on the iPhone
+Duo simulator, and fold, open and turn it.
 
 ## Moving an existing app over
 
@@ -259,22 +295,25 @@ A checklist for an app that already runs on phones:
    `DuoScope(lockPhonesUpright: false)` and lock with
    `DuoDesignSize.orientationsFor(screen, window: window)`. Don't lock to
    portrait from `main()`, because that also locks the open Duo.
-3. **The tab shell.** Wrap the tab pages in `SideTabBar`, and hide your bottom
-   bar when `SideTabBar.show(context)` is true.
+3. **The tab shell.** Replace it with `DuoNavigationShell`. To keep your own
+   bottom bar, pass it as `bottomBar`, or wrap the tab pages in `SideTabBar`
+   and hide the bar when `SideTabBar.show(context)` is true.
 4. **App bars.** Replace `AppBar` with `DuoAppBar`, and turn `IconButton`
    actions into `DuoAction`s. Move buttons with words (Cancel, Done, Add to
    bag) out of `actions`, into the page or a bottom bar.
 5. **Custom headers.** Wrap them in `SideToolbar`, and leave their buttons out
    when `SideToolbar.show(context)` is true.
 6. **Horizontal rows.** Wrap each one in `EdgeBleed`. Pad the page's scroll
-   view with `EdgeBleed.padding` instead of a side `SafeArea`.
+   view with `EdgeBleed.padding` instead of a side `SafeArea`, and wrap it in
+   `EdgeBleedArea`.
 7. **Grids.** Count columns with `DuoBreakpoints.columns(..., even: true)`.
 8. **Wide screens.** Where a list opens a detail page, show both with
    `TwoPane` when `TwoPane.fits(context)`.
 9. **Scaling.** If you use `flutter_screenutil`, switch to
    [`DuoDesignSize`](#with-flutter_screenutil).
 
-You can do steps 3 to 9 one screen at a time. Every widget is a no-op on a
+Then run `dart run iphone_duo:doctor`. You can do steps 3 to 9 one screen
+at a time. Every widget is a no-op on a
 phone, so a half-moved app still looks exactly as it did there.
 
 ## Widgets
@@ -326,6 +365,36 @@ blue, and the status bar's column in green. A line at the foot names the
 posture, the column's side, the window's size, and whether the answer came
 from iOS or from the safe area. None of it takes a tap. `DuoDebugOverlay`
 draws the same over any part of the app.
+
+### `DuoNavigationShell`
+
+An app's tabs in one widget: a `SideTabBar` down the status bar's column on
+the Duo closed or open on its side, and a `NavigationBar` at the foot
+everywhere else.
+
+```dart
+DuoNavigationShell(
+  destinations: const [
+    DuoDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+    DuoDestination(icon: Icon(Icons.storefront_outlined), label: 'Shop'),
+    DuoDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+  ],
+  selectedIndex: index,
+  onDestinationSelected: (i) => setState(() => index = i),
+  body: IndexedStack(index: index, children: pages),
+)
+```
+
+- **The pages keep their state.** `body` stays where it is in the tree
+  whichever bar shows, so opening the Duo doesn't start a tab over.
+- **`sideStyle`** styles the tabs down the column (`SideTabBarStyle`),
+  **`bottomStyle`** the `NavigationBar` (`NavigationBarThemeData`).
+- **`bottomBar`** is your own bar at the foot instead (a `CupertinoTabBar`,
+  one of your design), shown where the tabs aren't down the column.
+- **`minimizeOnScroll`** shrinks the side tabs on scroll, as iOS does. On by
+  default.
+
+With go_router, see [Recipes](#recipes).
 
 ### `SideTabBar`
 
@@ -629,6 +698,51 @@ ListDetail<Product>(
 - **`divider`**, `duration` and `curve` style the line between the panes and
   the change from one item to the next. Reduced motion skips it.
 
+#### Opening an item from outside the list
+
+A deep link, a notification or a search result opens an item through a
+`ListDetailController`:
+
+```dart
+final products = ListDetailController<Product>();
+
+ListDetail<Product>(controller: products, /* ... */);
+
+// From anywhere:
+products.open(product); // beside the list, or on its own page (onNarrowed)
+products.close();       // back to the placeholder
+products.selected;      // what is open
+```
+
+`open` returns `true` when the item shows beside the list, and `false` when
+it went to its own page through `onNarrowed` on a narrow window. Called
+before the list is built, it waits, and the item opens as the list first
+shows. The controller is a `ChangeNotifier`: dispose it in the state that
+made it.
+
+`initialItem` does the same for an item to start on:
+`ListDetail(initialItem: linked, ...)`.
+
+#### Pages inside the detail pane
+
+With `detailNavigator: true`, the detail pane has a navigator of its own: a
+page the item opens (its reviews, a photo) opens in the pane, beside the
+list, as Mail opens an attachment. Without it, that page covers both panes.
+
+```dart
+ListDetail<Product>(
+  detailNavigator: true,
+  // For Navigator.pushNamed in the pane; pass your app's own.
+  onGenerateDetailRoute: AppRoutes.generate,
+  /* ... */
+)
+```
+
+Under the item, `Navigator.of(context)` is the pane's navigator and
+`Navigator.of(context, rootNavigator: true)` the app's. When the Duo folds
+shut, the item goes to its own page, but the pages opened over it in the
+pane don't follow.
+
 ### `DialogOffFold`
 
 Keeps a dialog off the fold, as Apple asks: under a fold that runs across
@@ -728,23 +842,26 @@ edge of the glass, the way it scrolls off the edge of a phone. Without it,
 the row stops in a straight line beside the column.
 
 ```dart
-ListView(
-  // The page keeps its side insets inside the scroll view...
-  padding: EdgeBleed.padding(context, const EdgeInsets.all(16)),
-  children: [
-    const Text('Picks for you'),
-    // ...so the row can reach through them.
-    EdgeBleed(
-      child: SizedBox(
-        height: 176,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeBleed.padding(context, const EdgeInsets.symmetric(horizontal: 16)),
-          children: cards,
+EdgeBleedArea(
+  child: ListView(
+    // The page keeps its side insets inside the scroll view...
+    padding: EdgeBleed.padding(context, const EdgeInsets.all(16)),
+    children: [
+      const Text('Picks for you'),
+      // ...so the row can reach through them.
+      EdgeBleed(
+        child: SizedBox(
+          height: 176,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeBleed.padding(context, const EdgeInsets.symmetric(horizontal: 16)),
+            children: cards,
+          ),
         ),
       ),
-    ),
-  ],
+      const ListTile(title: Text('Orders')),
+    ],
+  ),
 )
 ```
 
@@ -754,6 +871,11 @@ ListView(
   first card lines up with the page's text, and the last can scroll clear of
   the column.
 - `EdgeBleed.sides(context)` is the side insets alone.
+- **`EdgeBleedArea` around the page's scroll view** takes the side insets
+  out of the `MediaQuery` under it, once the padding has them. Without it, a
+  `ListTile` (which has a `SafeArea` of its own) or any `SafeArea` in the
+  list keeps clear of the column a second time, and stops short of the
+  page's text. `EdgeBleed` and `HeroBleed` under it still reach the glass.
 - **Don't wrap the page's scroll view in a side `SafeArea`.** It clips the
   row at the inset. If you need one for the top and bottom, use
   `SafeArea(left: false, right: false)`.
@@ -883,6 +1005,26 @@ PostureBuilder(
 Use the hinge for effects and interactions, and the fold for layout. iOS
 sends the angle as often as it likes, so if you only need to know whether
 the Duo is half open, read `posture`.
+
+### `HingeBuilder`
+
+How far the Duo is open, from 0 folded shut to 1 flat, on every step of the
+hinge: for something that moves with the device, like a lid lifting or a
+welcome that unfolds as the Duo opens.
+
+```dart
+HingeBuilder(
+  child: const Logo(), // built once
+  builder: (context, open, child) => Transform.rotate(
+    angle: (1 - open) * 0.6,
+    child: child,
+  ),
+)
+```
+
+Off the Duo it's `fallback` (1 by default). It rebuilds many times a second
+while the Duo folds, so keep what doesn't move in `child`. For layout, use
+`PostureBuilder`.
 
 ### `TabletopLayout`
 
@@ -1066,6 +1208,76 @@ restarting. A half-filled form or a scrolled list stays as it was.
 If you set orientations yourself, `DuoDesignSize.orientationsFor(screen,
 window: window)` returns the ones `DuoScope` would use.
 
+## Recipes
+
+### go_router
+
+Make `DuoNavigationShell` the shell of a `StatefulShellRoute`: each branch
+keeps its own stack, and the shell its tabs.
+
+```dart
+StatefulShellRoute.indexedStack(
+  builder: (context, state, shell) => DuoNavigationShell(
+    destinations: destinations,
+    selectedIndex: shell.currentIndex,
+    onDestinationSelected: (i) =>
+        shell.goBranch(i, initialLocation: i == shell.currentIndex),
+    body: shell,
+  ),
+  branches: [/* ... */],
+)
+```
+
+Put `DuoScope` in `MaterialApp.router(builder: ...)`, as with `MaterialApp`.
+
+### A deep link into a list and its detail
+
+Keep the `ListDetailController` beside the list, and open the item when the
+link comes in. On the open Duo or an iPad it shows beside the list; on a
+phone it goes to its own page through `onNarrowed`.
+
+```dart
+class _ShopState extends State<Shop> {
+  final products = ListDetailController<Product>();
+
+  @override
+  void initState() {
+    super.initState();
+    links.listen((product) => products.open(product));
+  }
+
+  @override
+  void dispose() {
+    products.dispose();
+    super.dispose();
+  }
+
+  // build: ListDetail<Product>(controller: products, ...)
+}
+```
+
+For a link the app was opened with, `initialItem` is enough.
+
+### bloc, or any state management
+
+The widgets read only the window and iOS, never your state. Keep the
+selected tab or item in your cubit, and hand it down:
+
+```dart
+BlocBuilder<ShellCubit, int>(
+  builder: (context, index) => DuoNavigationShell(
+    selectedIndex: index,
+    onDestinationSelected: context.read<ShellCubit>().select,
+    destinations: destinations,
+    body: IndexedStack(index: index, children: pages),
+  ),
+)
+```
+
+### `flutter_screenutil`
+
+See [With `flutter_screenutil`](#with-flutter_screenutil).
+
 ## Testing your layouts
 
 You don't need the simulator to test the Duo.
@@ -1090,8 +1302,28 @@ The fold is 40 points with margins of 20: across at
 `Rect.fromLTWH(0, 455.5, 669, 40)`, down at
 `Rect.fromLTWH(455.5, 0, 40, 669)`.
 
-`scope` puts a widget in that window, as `DuoScope` would hand it down. Give
-the test's view the same size, so the layout fills it:
+`testDuoWidgets` runs a test once in each, named after it, with the test's
+view sized as that window and its insets. `scope` puts a widget in that
+window, with iOS's answer, as `DuoScope` would hand it down:
+
+```dart
+import 'package:iphone_duo/testing.dart';
+
+testDuoWidgets('the photos never sit on the fold', (tester, duo) async {
+  await tester.pumpWidget(MaterialApp(
+    builder: (context, child) => duo.scope(child: child!),
+    home: const ProductPage(),
+  ));
+  // ... expect ...
+});
+
+// Only some of them:
+testDuoWidgets('tabs down the column', (tester, duo) async { /* ... */ },
+    simulators: const [DuoSimulator.closed, DuoSimulator.onItsSide]);
+```
+
+`duo.applyTo(tester)` sizes the view alone, for a test of your own. Or by
+hand:
 
 ```dart
 import 'package:iphone_duo/testing.dart';
@@ -1295,7 +1527,8 @@ shows, as before.
 ## Example app
 
 `example/` is a small shop with four tabs, built with every widget in the
-package. Run it on an iPhone, an iPad and the iPhone Duo simulator. Then fold,
+package: the tabs are a `DuoNavigationShell`, and the Profile tab opens a
+product from a "deep link" through a `ListDetailController`. Run it on an iPhone, an iPad and the iPhone Duo simulator. Then fold,
 open and turn the Duo to see the same screens change:
 
 ```bash

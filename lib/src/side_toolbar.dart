@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'bar_edge.dart';
 import 'duo_device.dart';
 import 'window_class.dart';
+import 'debug_check.dart';
 
 /// A header's buttons, stood where iOS stands a toolbar on the iPhone Duo:
 /// down the column the status bar runs down ([BarEdge]), under the clock,
@@ -16,6 +17,8 @@ import 'window_class.dart';
 /// as a route comes and goes.
 ///
 /// [DuoAppBar] does all of this for an `AppBar`.
+///
+/// {@category Navigation}
 class SideToolbar extends StatefulWidget {
   const SideToolbar({
     super.key,
@@ -88,6 +91,7 @@ class _SideToolbarState extends State<SideToolbar> {
 
   @override
   Widget build(BuildContext context) {
+    debugCheckDuoScope(context, 'SideToolbar');
     final edge = context.barEdge;
     if (edge == null || widget.items.isEmpty) return widget.child;
 
@@ -134,6 +138,8 @@ class _SideToolbarState extends State<SideToolbar> {
 /// A round icon button for the column: a raised disc, as iOS draws the
 /// buttons it stands down the side, so it reads over whatever scrolls under
 /// it.
+///
+/// {@category Navigation}
 class SideToolbarButton extends StatelessWidget {
   const SideToolbarButton({
     super.key,
@@ -166,6 +172,8 @@ class SideToolbarButton extends StatelessWidget {
       child: Semantics(
         button: true,
         label: tooltip,
+        // The tap the InkWell would have given, for VoiceOver to press it.
+        onTap: onPressed,
         excludeSemantics: true,
         child: Material(
           color: backgroundColor ?? scheme.surface,

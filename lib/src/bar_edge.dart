@@ -9,6 +9,8 @@ import 'window_class.dart';
 /// Apple's guide for the iPhone Duo puts the tab bar, the toolbar and Back
 /// in that column, under the clock, and keeps them on that side of the
 /// glass whatever the reading direction. Read it with `context.barEdge`.
+///
+/// {@category Setup}
 enum BarEdge {
   left,
   right;
@@ -51,6 +53,8 @@ enum BarEdge {
 ///
 /// The hinge is an aspect of its own: it moves many times a second while
 /// the Duo folds, and only what reads it rebuilds then.
+///
+/// {@category Setup}
 class BarEdgeScope extends InheritedModel<Object> {
   const BarEdgeScope({
     super.key,
@@ -119,6 +123,8 @@ class BarEdgeScope extends InheritedModel<Object> {
 }
 
 /// What a screen asks of the window it is in.
+///
+/// {@category Setup}
 extension DuoContext on BuildContext {
   /// The side the status bar runs down, or null when it runs along the top.
   ///

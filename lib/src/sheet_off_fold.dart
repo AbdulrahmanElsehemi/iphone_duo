@@ -17,6 +17,8 @@ import 'two_pane.dart';
 /// * Anywhere else, the sheet [showModalBottomSheet] opens.
 ///
 /// The rest is passed on as it is.
+///
+/// {@category Off the fold}
 Future<T?> showModalBottomSheetOffFold<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -99,6 +101,8 @@ Future<T?> showModalBottomSheetOffFold<T>({
 ///
 /// [showModalBottomSheetOffFold] puts it in; wrap a sheet's content in it
 /// yourself when you open the sheet some other way.
+///
+/// {@category Off the fold}
 class SheetOffFold extends StatelessWidget {
   const SheetOffFold({super.key, required this.child});
 

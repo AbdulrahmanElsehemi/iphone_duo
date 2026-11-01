@@ -15,21 +15,23 @@ class SavedPage extends StatelessWidget {
         builder: (context, constraints) {
           final width =
               constraints.maxWidth - EdgeBleed.sides(context).horizontal - 32;
-          return GridView.count(
-            crossAxisCount: DuoBreakpoints.columns(
-              width,
-              tile: 150,
-              gap: 12,
-              even: true,
+          return EdgeBleedArea(
+            child: GridView.count(
+              crossAxisCount: DuoBreakpoints.columns(
+                width,
+                tile: 150,
+                gap: 12,
+                even: true,
+              ),
+              padding: EdgeBleed.padding(
+                context,
+                const EdgeInsets.fromLTRB(16, 8, 16, 120),
+              ),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.8,
+              children: [for (final p in products.take(5)) ProductCard(p)],
             ),
-            padding: EdgeBleed.padding(
-              context,
-              const EdgeInsets.fromLTRB(16, 8, 16, 120),
-            ),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.8,
-            children: [for (final p in products.take(5)) ProductCard(p)],
           );
         },
       ),

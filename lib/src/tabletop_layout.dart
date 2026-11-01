@@ -22,6 +22,8 @@ import 'posture_builder.dart';
 /// Moving between [child] and the two halves builds them anew. Keep what
 /// has to last (a scroll position, a pick) above this, or under a
 /// `GlobalKey` both use.
+///
+/// {@category Off the fold}
 class TabletopLayout extends StatelessWidget {
   const TabletopLayout({
     super.key,

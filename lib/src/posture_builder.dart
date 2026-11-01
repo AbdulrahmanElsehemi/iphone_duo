@@ -10,6 +10,8 @@ import 'duo_device.dart';
 /// times a second while the Duo folds. A page laid out by its posture needs
 /// none of those, so this reads the hinge itself and hands [builder] the
 /// posture alone.
+///
+/// {@category Device}
 class PostureBuilder extends StatefulWidget {
   const PostureBuilder({super.key, required this.builder});
 

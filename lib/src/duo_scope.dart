@@ -33,6 +33,8 @@ import 'duo_device.dart';
 ///   list the landscape ones too, or iOS never lets the open Duo turn.
 /// * With [debugShowRegions], it draws the fold, the camera and the column
 ///   over the app ([DuoDebugOverlay]).
+///
+/// {@category Setup}
 class DuoScope extends StatefulWidget {
   const DuoScope({
     super.key,

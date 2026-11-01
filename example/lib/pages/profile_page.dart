@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import '../data.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, required this.onOpenLink});
+
+  /// Opens a product as a deep link would: through the shop's
+  /// `ListDetailController`.
+  final VoidCallback onOpenLink;
 
   @override
   Widget build(BuildContext context) {
@@ -17,21 +21,38 @@ class ProfilePage extends StatelessWidget {
     ];
     return Scaffold(
       appBar: DuoAppBar(title: Text(tr(context, 'Profile', 'حسابي'))),
-      body: ListView(
-        padding: EdgeBleed.padding(
-          context,
-          const EdgeInsets.fromLTRB(16, 8, 16, 120),
-        ),
-        children: [
-          const DeviceCard(),
-          for (final (icon, label) in items)
+      body: EdgeBleedArea(
+        child: ListView(
+          padding: EdgeBleed.padding(
+            context,
+            const EdgeInsets.fromLTRB(16, 8, 16, 120),
+          ),
+          children: [
+            const DeviceCard(),
             ListTile(
-              leading: Icon(icon),
-              title: Text(label),
+              leading: const Icon(Icons.link),
+              title: Text(
+                tr(context, 'Open a linked product', 'افتح منتجًا من رابط'),
+              ),
+              subtitle: Text(
+                tr(
+                  context,
+                  'As a deep link does: beside the list when there is room',
+                  'كما يفعل الرابط: بجانب القائمة إن اتسعت الشاشة',
+                ),
+              ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
+              onTap: onOpenLink,
             ),
-        ],
+            for (final (icon, label) in items)
+              ListTile(
+                leading: Icon(icon),
+                title: Text(label),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {},
+              ),
+          ],
+        ),
       ),
     );
   }

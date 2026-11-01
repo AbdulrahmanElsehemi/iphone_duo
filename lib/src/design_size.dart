@@ -7,6 +7,8 @@ import 'window_class.dart';
 
 /// The design frame a scaling library (`flutter_screenutil`'s `designSize`)
 /// measures against, picked for the window the app is in.
+///
+/// {@category Device}
 abstract final class DuoDesignSize {
   /// The frame for a [window] of this size, in logical pixels, for a design
   /// drawn on a [phoneFrame] (390 × 844, an iPhone 14).
